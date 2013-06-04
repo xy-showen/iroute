@@ -245,6 +245,7 @@ int route::param_match(handler_route *handler_p, char *param){
 	std::cout<<"&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"<<std::endl;
 	std::cout<<handler_p->char_uri<<std::endl;
 
+
 	static const char sign2 = '&';
 	
 	int has_match = 0;//已经匹配的参数
@@ -253,6 +254,9 @@ int route::param_match(handler_route *handler_p, char *param){
 	char *temp = new char[strlen(param)];
 	strcpy(temp, param);
 
+	std::cout<<param<<std::endl;
+	std::cout<<temp<<std::endl;
+	
 	char *need_p = strtok(temp, &sign2);
 
 	std::cout<<"!!!!!!need_p!!!!!!!"<<std::endl;
@@ -293,6 +297,8 @@ int route::param_match(handler_route *handler_p, char *param){
 
 
 	std::cout<<"&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"<<std::endl;
+
+	delete temp;
 	return has_match == need_match;
 }
 
