@@ -1,8 +1,7 @@
 #include <node.h>
 #include <string>
 #include <iostream>
-#include <ctype.h>
-#include <string.h>
+
 
 #include "handler_route.h"
 #include "request.h"
@@ -10,8 +9,10 @@
 
 using namespace v8;
 
+
+
 namespace iroute{
-  uv_rwlock_t numlock;
+
   static int isAdd = 0;
 	
   static handler_route **handler_p_get;           //指向get的handler实例指针数组的指针
@@ -23,7 +24,9 @@ namespace iroute{
   static handler_route **handler_p_delete;        //delete
   static int delete_len;
   static Persistent<Object> default_callback;     //默认回调函数，表示未匹配到控制器
-  
+
+
+ 
 
 }
 
@@ -82,32 +85,7 @@ Handle<Value> route::add(const Arguments& args){
 
 	iroute::default_callback = Persistent<Object>::New(args[1]->ToObject());
 
-/*
 
-	for(int j=0;j<iroute::get_len;j++){
-		std::cout<<(iroute::handler_p_get[j])->uri<<std::endl;
-		std::cout<<(iroute::handler_p_get[j])->char_uri_len<<std::endl;
-		std::cout<<(iroute::handler_p_get[j])->param<<std::endl;
-	}
-
-	for(int j=0;j<iroute::post_len;j++){
-		std::cout<<(iroute::handler_p_post[j])->uri<<std::endl;
-		std::cout<<(iroute::handler_p_post[j])->char_uri_len<<std::endl;
-		std::cout<<(iroute::handler_p_post[j])->param<<std::endl;
-	}
-
-	for(int j=0;j<iroute::put_len;j++){
-		std::cout<<(iroute::handler_p_put[j])->uri<<std::endl;
-		std::cout<<(iroute::handler_p_put[j])->char_uri_len<<std::endl;
-		std::cout<<(iroute::handler_p_put[j])->param<<std::endl;
-	}
-
-	for(int j=0;j<iroute::delete_len;j++){
-		std::cout<<(iroute::handler_p_delete[j])->uri<<std::endl;
-		std::cout<<(iroute::handler_p_delete[j])->char_uri_len<<std::endl;
-		std::cout<<(iroute::handler_p_delete[j])->param<<std::endl;
-	}
-*/
 
 
 	iroute::isAdd = 1;
@@ -122,22 +100,33 @@ void route::loop_add(Handle<Object> array, handler_route **handler_p, int len){
 		handler_route *hp = new handler_route(); //创建指向 handler_route 实例的指针
 		Local<Object> obj = array->Get(i)->ToObject();
 		
-		hp->uri = toCString(obj->Get(String::New("uri")));
-	
 
-		hp->param = toCString(obj->Get(String::New("param")));
-	
-
-		hp->char_uri = new char[hp->uri.length() + 1]; //获得uri的char*
-		strcpy(hp->char_uri, hp->uri.c_str());
+		std::string temp_uri = toCString(obj->Get(String::New("uri")));
+		hp->char_uri = new char[temp_uri.length() + 1]; //获得uri的char*
+		strcpy(hp->char_uri, temp_uri.c_str());
 		hp->char_uri_len = strlen(hp->char_uri);//获得uri长度
-
-		hp->char_param = new char[hp->param.length() + 1]; //获得param的char*
-		strcpy(hp->char_param, hp->param.c_str());
-		hp->char_param_len = strlen(hp->char_param);//获得param长度
 
 
 		hp->callback = Persistent<Object>::New(obj->Get(String::New("callback"))->ToObject());
+
+
+		int param_array_length = Local<Array>::Cast(obj->Get(String::New("param")))->Length();//获得参数数组的长度
+		hp->char_param = new char*[param_array_length];//生成指向指针数组的指针,保存参数数组
+		hp->char_param_count = param_array_length;//保存参数数组长度
+
+		for(int i=0;i<param_array_length;i++){
+
+			String::Utf8Value value(obj->Get(String::New("param"))->ToObject()->Get(i)->ToObject());//conver to utf8-value
+
+			std::string temp = *value;
+
+			hp->char_param[i] = new char[temp.length() + 1];//将参数key存入内存
+			strcpy(hp->char_param[i], temp.c_str());//复制key
+
+			//std::cout<<hp->char_param[i]<<std::endl;
+
+		}
+
 
 		handler_p[i] = hp; //将指针存入 指针数组等待匹配
 
@@ -185,8 +174,8 @@ Handle<Value> route::match(const Arguments& args){
 
 
 void route::worker_callback(Request &req){
-
 	static const char sign1 = '?';
+
 	char *char_uri = strtok(req.url, &sign1);
 
 	handler_route* handler_p = 0;
@@ -210,16 +199,13 @@ void route::worker_callback(Request &req){
 	
 	char *param = strtok(NULL, &sign1);
 
-	if(handler_p && handler_p->param != "false"){
+
+	if(handler_p && handler_p->char_param_count){
 
 		if(!param) handler_p = 0;
 		else{	
 
-				std::string string_param = param;
-
-
-
-				handler_p = param_match(handler_p, string_param) ? handler_p : 0;
+			handler_p = param_match(handler_p, param) ? handler_p : 0;
 		}
 
 
@@ -242,6 +228,8 @@ handler_route* route::uri_match(handler_route **handler_p,int len,const char *ch
 
 		int loc = strncmp(char_uri, handler_p[i]->char_uri, handler_p[i]->char_uri_len+pos);
 
+
+
 		if( loc == 0 ){ //匹配uri地址成功
 
 			return handler_p[i];
@@ -252,38 +240,46 @@ handler_route* route::uri_match(handler_route **handler_p,int len,const char *ch
 	return 0;
 }
 
-int route::param_match(handler_route *handler_p, std::string &param){
-
-	int i = 1;
-
+int route::param_match(handler_route *handler_p, char *param){
+	
 	static const char sign2 = '&';
+	
+	int has_match = 0;//已经匹配的参数
+	int need_match = handler_p->char_param_count;//需要匹配的参数数量
 
-	char *temp = new char[handler_p->char_param_len]; //获得uri的char*
-	strcpy(temp, handler_p->char_param);
-
-
+	char *temp = new char[strlen(param)];
+	strcpy(temp, param);
 
 	char *need_p = strtok(temp, &sign2);
+
+
+
 
 	while(need_p){
 
 
-		std::string::size_type po = param.find(need_p, 0, strlen(need_p));
+
+			for(int i=0;i<handler_p->char_param_count;i++){
+				
+					int key_len = strlen(handler_p->char_param[i]);
+					int loc = strncmp(need_p, handler_p->char_param[i], key_len);
+
+					if(loc == 0){//如果匹配到，则跳出循环
+						has_match++;
+						break;
+					}
+			}
+
+			
 
 
-		if(po == std::string::npos){	
-
-			delete temp;
-			return 0;
-		}
 
 		need_p = strtok(NULL, &sign2);
 
 	}
 
-	
 	delete temp;
-	return 1;
+	return has_match == need_match;
 }
 
 

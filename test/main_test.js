@@ -5,6 +5,7 @@ iroute.add([
 ["get:/test1/",function(req,res){res.end('test1')}],
 ["get:/test2/test2/test2/test2/",function(req,res){res.end('test2')}],
 ["get:/test3/test3/test3/test3?key1&key2&key3",function(req,res){res.end('test3')}],
+
 ["post:/test4",function(req,res){res.end('test4')}],
 ["post:/test5/test5/test5/test5",function(req,res){res.end('test5')}],
 ["post:/test6/test6/test6/test6?key1&key2&key3",function(req,res){res.end('test6')}],
@@ -14,6 +15,7 @@ iroute.add([
 ["delete:/test10",function(req,res){res.end('test10')}],
 ["delete:/test11/test11/test11/test11",function(req,res){res.end('test11')}],
 ["delete:/test12/test12/test12/test12?key1&key2&key3&key4&key5&key6&key7&key8&key9&key10",function(req,res){res.end('test12')}]
+
 ],function(req,res){
 	res.statusCode = 404;
 	res.end('404')
@@ -99,9 +101,9 @@ if(method !== "GET"){
 
 
 
-
 //begin test
 //get
+
 setTimeout(function(){
 	
 request('/TEST1/', 'GET', function (error, response, body) {
@@ -125,7 +127,7 @@ request('/test2/test2/test2/test2/','GET', function (error, response, body) {
 },500)
 
 setTimeout(function(){
-	request('/test3/test3/test3/test3?key1=%92%e5%b1%b1%e4%b8%9c%e7%9c%81key2=%92%e5%b1%b1%e4%b8%9c%e7%9c%81&key3=%92%e5%b1%b1%e4%b8%9c%e7%9c%81', 'GET', function (error, response, body) {
+	request('/test3/test3/test3/test3?key1=%92%e5%b1%b1%e4%b8%9c%e7%9c%81&key2=%92%e5%b1%b1%e4%b8%9c%e7%9c%81&key3=%92%e5%b1%b1%e4%b8%9c%e7%9c%81', 'GET', function (error, response, body) {
 		assert.equal(response.statusCode,200)
 		assert.equal(body,'test3')
 		test_back('get4')
