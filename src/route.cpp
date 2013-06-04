@@ -25,9 +25,6 @@ namespace iroute{
   static int delete_len;
   static Persistent<Object> default_callback;     //默认回调函数，表示未匹配到控制器
 
-
- 
-
 }
 
 
@@ -84,9 +81,6 @@ Handle<Value> route::add(const Arguments& args){
 	loop_add(delete_array, iroute::handler_p_delete, iroute::delete_len);
 
 	iroute::default_callback = Persistent<Object>::New(args[1]->ToObject());
-
-
-
 
 	iroute::isAdd = 1;
 	return Undefined(); 
@@ -166,8 +160,6 @@ Handle<Value> route::match(const Arguments& args){
 
 	}
 	
-
-	//delete rq_p;
 	return Undefined(); 
 };
 
