@@ -176,6 +176,12 @@ Handle<Value> route::match(const Arguments& args){
 void route::worker_callback(Request &req){
 	static const char sign1 = '?';
 
+	std::cout<<"~~~~~~~~~~~uri~~~~~~~~~~"<<std::endl;
+
+	std::cout<<req.url<<std::endl;
+
+
+
 	char *char_uri = strtok(req.url, &sign1);
 
 	handler_route* handler_p = 0;
@@ -197,8 +203,17 @@ void route::worker_callback(Request &req){
 		handler_p = uri_match(iroute::handler_p_delete, iroute::delete_len, char_uri);
 	}
 	
+
+
+	std::cout<<char_uri<<std::endl;
+
+
+
+
 	char *param = strtok(NULL, &sign1);
 
+	std::cout<<param<<std::endl;
+	std::cout<<"~~~~~~~~~~~uri~~~~~~~~~~"<<std::endl;
 
 	if(handler_p && handler_p->char_param_count){
 
@@ -240,10 +255,13 @@ handler_route* route::uri_match(handler_route **handler_p,int len,const char *ch
 	return 0;
 }
 
+
+
 int route::param_match(handler_route *handler_p, char *param){
 	
 	std::cout<<"&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"<<std::endl;
 	std::cout<<handler_p->char_uri<<std::endl;
+
 
 
 	static const char sign2 = '&';
@@ -256,7 +274,7 @@ int route::param_match(handler_route *handler_p, char *param){
 
 	std::cout<<param<<std::endl;
 	std::cout<<temp<<std::endl;
-	
+
 	char *need_p = strtok(temp, &sign2);
 
 	std::cout<<"!!!!!!need_p!!!!!!!"<<std::endl;
