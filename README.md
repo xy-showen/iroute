@@ -7,7 +7,7 @@ the module are also be used in flat.js framework.
 
 With [npm](http://npmjs.org/):
 
-iroute module is supported windows, linux.
+iroute module is supported windows, linux, mac.
 
 Make sure, node-gyp has installed.
 
