@@ -242,6 +242,7 @@ handler_route* route::uri_match(handler_route **handler_p,int len,const char *ch
 
 int route::param_match(handler_route *handler_p, char *param){
 	
+	return 1;
 	static const char sign2 = '&';
 	
 	int has_match = 0;//已经匹配的参数
