@@ -5,6 +5,7 @@ iroute.add([
 ["get:/test1/",function(req,res){res.end('test1')}],
 ["get:/test2/test2/test2/test2/",function(req,res){res.end('test2')}],
 ["get:/test3/test3/test3/test3?key1&key2&key3",function(req,res){res.end('test3')}],
+
 ["post:/test4",function(req,res){res.end('test4')}],
 ["post:/test5/test5/test5/test5",function(req,res){res.end('test5')}],
 ["post:/test6/test6/test6/test6?key1&key2&key3",function(req,res){res.end('test6')}],
@@ -22,7 +23,34 @@ iroute.add([
 
 
 
+
+
+var http = require('http');
+
 var assert = require('assert');
+
+
+http.createServer(function (req, res) {
+	//request.url
+	//request.method
+	var buf_list = [];
+	var len=0;
+	req.on("data",function(chunk){
+		buf_list.push(chunk);
+		len += chunk.length;
+	})
+	req.on("end", function(){
+		req.body = Buffer.concat(buf_list, len).toString();
+		if(req.url != '/favicon.ico') {
+		//console.log(req.url)
+		 iroute.route(req,res);
+		} 
+	})
+
+
+}).listen(8124);
+
+console.log('Server running at http://127.0.0.1:8124/');
 
 
 
@@ -41,17 +69,32 @@ var test_back = function(msg){
 
 function request(path, method, cb){
 
-	var req = {
-		method:method,
-		url:path
-	}
-	var res={end:function(s){
-		if(!this.statusCode) this.statusCode= 200;
-		 
-		this.body = s;
-	}}
-	iroute.route(req,res);
-	cb(null,res,res.body);
+	var options = {
+	  hostname: '127.0.0.1',
+	  port: 8124,
+	  path: path,
+	  method: method
+	};
+	var req = http.request(options, function(res) {
+
+	  //console.log('STATUS: ' + res.statusCode);
+	 //console.log('HEADERS: ' + JSON.stringify(res.headers));
+	  res.setEncoding('utf8');
+	  res.on('data', function (chunk) {
+	  	cb(null, res, chunk+'');
+	  });
+
+	});
+
+	req.on('error', function(e) {
+	  console.log('problem with request: ' + e.message);
+	});
+if(method !== "GET"){
+	// write data to request body
+	req.write('data\n');
+	req.write('data\n');
+}
+	req.end();
 
 }
 
@@ -61,7 +104,7 @@ function request(path, method, cb){
 //begin test
 //get
 
-
+setTimeout(function(){
 	
 request('/TEST1/', 'GET', function (error, response, body) {
 	assert.equal(response.statusCode,200)
@@ -81,7 +124,9 @@ request('/test2/test2/test2/test2/','GET', function (error, response, body) {
 	test_back('get3')
 })
 
+},500)
 
+setTimeout(function(){
 	request('/test3/test3/test3/test3?key1=%92%e5%b1%b1%e4%b8%9c%e7%9c%81&key2=%92%e5%b1%b1%e4%b8%9c%e7%9c%81&key3=%92%e5%b1%b1%e4%b8%9c%e7%9c%81', 'GET', function (error, response, body) {
 		assert.equal(response.statusCode,200)
 		assert.equal(body,'test3')
@@ -107,11 +152,11 @@ request('/test2/test2/test2/test2/','GET', function (error, response, body) {
 		test_back('get7')
 	})
 
+},1000)
 
 
 
-
-
+setTimeout(function(){
 //post
 request('/test4','POST',  function (error, response, body) {
 	assert.equal(response.statusCode,200)
@@ -131,10 +176,10 @@ request('/test6/test6/test6/test6?key1=1&key2=2&key3=3','POST',  function (error
 	test_back('post3')
 })
 
-
+},1500)
 
 //put
-
+setTimeout(function(){
 request('/test7','PUT',  function (error, response, body) {
 	assert.equal(response.statusCode,200)
 	assert.equal(body,'test7')
@@ -152,12 +197,12 @@ request('/test9/test9/test9/test9/?key1=111','PUT',  function (error, response, 
 	assert.equal(body,'test9')
 	test_back('put3')
 })
-
+},2000)
 
 
 
 //delete
-
+setTimeout(function(){
 request('/test10','DELETE',  function (error, response, body) {
 	assert.equal(response.statusCode,200)
 	assert.equal(body,'test10')
@@ -176,4 +221,4 @@ request('/test12/test12/test12/test12?key1=&key2=&key3=&key4=&key5=&key6=&key7=&
 	test_back('del3')
 })
 
- 
+},2500)
