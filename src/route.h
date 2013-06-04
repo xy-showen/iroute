@@ -20,6 +20,7 @@ class route {
   static handler_route* uri_match(handler_route **handler_p, int len,const char *char_uri);
   static int param_match(handler_route *handler_p, char *param);
   static inline char* strlwr2(char* str);
+  static char* mystrsep(char** stringp, const char* delim);
   route(){};
   ~route(){};
 

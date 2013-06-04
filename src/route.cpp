@@ -2,7 +2,7 @@
 #include <string>
 #include <iostream>
 #include <string.h>
-
+#include <stdlib.h>
 #include "handler_route.h"
 #include "request.h"
 #include "route.h"
@@ -181,12 +181,16 @@ void route::worker_callback(Request &req){
 	std::cout<<req.url<<std::endl;
 
 
-
-	char *char_uri = strtok(req.url, &sign1);
+#ifdef WIN32
+	char *char_uri = mystrsep(&req.url, &sign1);
+#else
+	char *char_uri = strsep(&req.url, &sign1);
+#endif
 	
-
+	
+	std::cout<<char_uri<<std::endl;
+	
 	handler_route* handler_p = 0;
-
 
 	std::string method = req.method;
 
@@ -205,24 +209,16 @@ void route::worker_callback(Request &req){
 	}
 	
 
-
-	std::cout<<char_uri<<std::endl;
-
-	static const char sign4 = ' ';
-	char_uri = strtok(NULL, &sign4);
-
-
 	
 
-	std::cout<<char_uri<<std::endl;
 	std::cout<<"~~~~~~~~~~~uri~~~~~~~~~~"<<std::endl;
 
 	if(handler_p && handler_p->char_param_count){
 
-		if(!char_uri) handler_p = 0;
+		if(!req.url) handler_p = 0;
 		else{	
 
-			handler_p = param_match(handler_p, char_uri) ? handler_p : 0;
+			handler_p = param_match(handler_p, req.url) ? handler_p : 0;
 		}
 
 
@@ -271,13 +267,19 @@ int route::param_match(handler_route *handler_p, char *param){
 	int has_match = 0;//已经匹配的参数
 	int need_match = handler_p->char_param_count;//需要匹配的参数数量
 
-	char *temp = new char[strlen(param)];
-	strcpy(temp, param);
+
 
 	std::cout<<param<<std::endl;
-	std::cout<<temp<<std::endl;
 
-	char *need_p = strtok(temp, &sign2);
+
+
+#ifdef WIN32
+	char *need_p = mystrsep(&param, &sign2);
+#else
+	char *need_p = strsep(&param, &sign2);
+#endif
+	
+
 
 	std::cout<<"!!!!!!need_p!!!!!!!"<<std::endl;
 	std::cout<<need_p<<std::endl;
@@ -306,7 +308,11 @@ int route::param_match(handler_route *handler_p, char *param){
 			}
 
 			
-		need_p = strtok(NULL, &sign2);
+	#ifdef WIN32
+		need_p = mystrsep(&param, &sign2);
+	#else
+		need_p = strsep(&param, &sign2);
+	#endif
 
 	}
 
@@ -318,7 +324,7 @@ int route::param_match(handler_route *handler_p, char *param){
 
 	std::cout<<"&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"<<std::endl;
 
-	delete temp;
+
 	return has_match == need_match;
 }
 
@@ -340,4 +346,24 @@ char* route::strlwr2(char* str)
    for ( ; *str != '\0'; str++ )
        *str = tolower(*str);
    return orig;
+}
+
+char* route::mystrsep(char** stringp, const char* delim)
+{
+  char* start = *stringp;
+  char* p;
+
+  p = (start != NULL) ? strpbrk(start, delim) : NULL;
+
+  if (p == NULL)
+  {
+    *stringp = NULL;
+  }
+  else
+  {
+    *p = '\0';
+    *stringp = p + 1;
+  }
+
+  return start;
 }
