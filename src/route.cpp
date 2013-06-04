@@ -183,7 +183,8 @@ void route::worker_callback(Request &req){
 
 
 	char *char_uri = strtok(req.url, &sign1);
-
+	char *param = strtok(NULL, &sign1);
+	
 	handler_route* handler_p = 0;
 
 
@@ -210,7 +211,7 @@ void route::worker_callback(Request &req){
 
 
 
-	char *param = strtok(NULL, &sign1);
+	
 
 	std::cout<<param<<std::endl;
 	std::cout<<"~~~~~~~~~~~uri~~~~~~~~~~"<<std::endl;
