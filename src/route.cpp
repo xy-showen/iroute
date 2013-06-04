@@ -252,12 +252,7 @@ int route::param_match(handler_route *handler_p, char *param){
 
 	char *need_p = strtok(temp, &sign2);
 
-
-
-
 	while(need_p){
-
-
 
 			for(int i=0;i<handler_p->char_param_count;i++){
 				
@@ -271,14 +266,10 @@ int route::param_match(handler_route *handler_p, char *param){
 			}
 
 			
-
-
-
 		need_p = strtok(NULL, &sign2);
 
 	}
 
-	delete temp;
 	return has_match == need_match;
 }
 
