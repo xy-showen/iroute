@@ -1,7 +1,7 @@
 #include <node.h>
 #include <string>
 #include <iostream>
-
+#include <string.h>
 
 #include "handler_route.h"
 #include "request.h"
