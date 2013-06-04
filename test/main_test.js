@@ -57,12 +57,16 @@ function request(path, method, cb){
 
 
 
-
+	request('/test3/test3/test3/test3?key1=%92%e5%b1%b1%e4%b8%9c%e7%9c%81&key2=%92%e5%b1%b1%e4%b8%9c%e7%9c%81&key3=%92%e5%b1%b1%e4%b8%9c%e7%9c%81', 'GET', function (error, response, body) {
+		assert.equal(response.statusCode,200)
+		assert.equal(body,'test3')
+		test_back('get4')
+	})
 //begin test
 //get
 
 
-	
+/*	
 request('/TEST1/', 'GET', function (error, response, body) {
 	assert.equal(response.statusCode,200)
 	assert.equal(body,'test1')
@@ -83,11 +87,6 @@ request('/test2/test2/test2/test2/','GET', function (error, response, body) {
 })
 
 
-	request('/test3/test3/test3/test3?key1=%92%e5%b1%b1%e4%b8%9c%e7%9c%81&key2=%92%e5%b1%b1%e4%b8%9c%e7%9c%81&key3=%92%e5%b1%b1%e4%b8%9c%e7%9c%81', 'GET', function (error, response, body) {
-		assert.equal(response.statusCode,200)
-		assert.equal(body,'test3')
-		test_back('get4')
-	})
 
 	request('/test3/test3/test3/test3/?key1&key2&&&key3=123', 'GET', function (error, response, body) {
 		//assert.equal(response.statusCode,404)
@@ -178,3 +177,4 @@ request('/test12/test12/test12/test12?key1=&key2=&key3=&key4=&key5=&key6=&key7=&
 })
 
  
+*/
