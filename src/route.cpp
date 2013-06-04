@@ -208,7 +208,8 @@ void route::worker_callback(Request &req){
 
 	std::cout<<char_uri<<std::endl;
 
-	char_uri = strtok(NULL, &sign1);
+	static const char sign4 = ' ';
+	char_uri = strtok(NULL, &sign4);
 
 
 	
