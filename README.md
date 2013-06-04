@@ -23,9 +23,20 @@ To include the module in your project:
 
      var iroute = require('iroute');
 
+##benchmark
+
+to run 1000 handler and match 10000 times,regexp match and iroute result is follow:
+
+      regexp: 1107ms
+      cb1 run times :10000
+      iroute: 251ms
+      cb2 run times :10000
+
+wow!!it's 4 times faster than regex match router.
+
 ## example
 
-    var iroute = require('../index')
+    var iroute = require('iroute')
 
     iroute.add([
 
