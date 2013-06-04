@@ -154,7 +154,7 @@ Handle<Value> route::match(const Arguments& args){
 	}
 	Request req;
 
-	String::AsciiValue url(args[0]->ToObject()->Get(String::New("url2"))->ToString());//conver
+	String::Utf8Value url(args[0]->ToObject()->Get(String::New("url2"))->ToString());//conver
 	req.url = *url;
 
 	req.method = toCString(args[0]->ToObject()->Get(String::New("method")));
@@ -291,7 +291,7 @@ int route::param_match(handler_route *handler_p, std::string &param){
 
 
 std::string route::toCString(Handle<Value> strp){
-      String::AsciiValue value(strp->ToString());//conver to utf8-value
+      String::Utf8Value value(strp->ToString());//conver to utf8-value
       std::string str = *value;
       return str;
 }

@@ -1,6 +1,6 @@
 {
   "name": "iroute",
-  "version": "0.1.2",
+  "version": "0.1.5",
   "main": "index.js",
   "description": "High performance nodejs route with c++",
   "keywords": [
@@ -24,7 +24,6 @@
   },
 
   "scripts": {
-    "preinstall": "node install.js",
     "install": "node-gyp rebuild",
     "test": "node ./test/main_test.js"
   },
