@@ -146,7 +146,7 @@ setTimeout(function(){
 		test_back('get6')
 	})
 
-	request('/test3/test3/test3/test3/??key1=1111&key2=22222&key3=333','GET',  function (error, response, body) {
+	request('/test3/test3/test3/test3/?key1=1111&key2=22222&key3=333','GET',  function (error, response, body) {
 		assert.equal(response.statusCode,200)
 		assert.equal(body,'test3')
 		test_back('get7')

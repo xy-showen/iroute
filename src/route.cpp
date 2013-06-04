@@ -176,9 +176,6 @@ Handle<Value> route::match(const Arguments& args){
 void route::worker_callback(Request &req){
 	static const char sign1 = '?';
 
-	std::cout<<"~~~~~~~~~~~uri~~~~~~~~~~"<<std::endl;
-
-	std::cout<<req.url<<std::endl;
 
 
 #ifdef WIN32
@@ -188,7 +185,7 @@ void route::worker_callback(Request &req){
 #endif
 	
 	
-	std::cout<<char_uri<<std::endl;
+
 	
 	handler_route* handler_p = 0;
 
@@ -208,11 +205,6 @@ void route::worker_callback(Request &req){
 		handler_p = uri_match(iroute::handler_p_delete, iroute::delete_len, char_uri);
 	}
 	
-
-	
-
-	std::cout<<"~~~~~~~~~~~uri~~~~~~~~~~"<<std::endl;
-
 	if(handler_p && handler_p->char_param_count){
 
 		if(!req.url) handler_p = 0;
@@ -257,19 +249,11 @@ handler_route* route::uri_match(handler_route **handler_p,int len,const char *ch
 
 int route::param_match(handler_route *handler_p, char *param){
 	
-	std::cout<<"&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"<<std::endl;
-	std::cout<<handler_p->char_uri<<std::endl;
-
-
 
 	static const char sign2 = '&';
 	
 	int has_match = 0;//已经匹配的参数
 	int need_match = handler_p->char_param_count;//需要匹配的参数数量
-
-
-
-	std::cout<<param<<std::endl;
 
 
 
@@ -279,12 +263,6 @@ int route::param_match(handler_route *handler_p, char *param){
 	char *need_p = strsep(&param, &sign2);
 #endif
 	
-
-
-	std::cout<<"!!!!!!need_p!!!!!!!"<<std::endl;
-	std::cout<<need_p<<std::endl;
-	std::cout<<"!!!!!!need_p!!!!!!!"<<std::endl;
-
 	while(need_p){
 
 
@@ -294,12 +272,6 @@ int route::param_match(handler_route *handler_p, char *param){
 				
 					int key_len = strlen(handler_p->char_param[i]);
 					int loc = strncmp(need_p, handler_p->char_param[i], key_len);
-
-					std::cout<<"####in for#######"<<std::endl;
-					std::cout<<need_p<<std::endl;
-					std::cout<<handler_p->char_param[i]<<std::endl;
-					std::cout<<loc<<std::endl;				
-					std::cout<<"####in for#######"<<std::endl;
 
 					if(loc == 0){//如果匹配到，则跳出循环
 						has_match++;
@@ -315,15 +287,6 @@ int route::param_match(handler_route *handler_p, char *param){
 	#endif
 
 	}
-
-	std::cout<<"@@@@@@has match@@@@@@"<<std::endl;
-	std::cout<<has_match<<std::endl;
-	std::cout<<need_match<<std::endl;
-	std::cout<<"@@@@@@has match@@@@@@"<<std::endl;
-
-
-	std::cout<<"&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"<<std::endl;
-
 
 	return has_match == need_match;
 }
