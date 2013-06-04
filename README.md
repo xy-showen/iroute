@@ -1,4 +1,4 @@
-# iroute(fast and simple nodejs http/https router module)
+# iroute(fast and simple nodejs http/https router module) [![Build Status](https://travis-ci.org/DoubleSpout/iroute.png?branch=master)](https://travis-ci.org/DoubleSpout/iroute)
 
 if you only want to build a simple http server and don't want to use express,so iroute module could simple and fast to handler the request to action.
 the module are also be used in flat.js framework.
