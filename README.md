@@ -83,5 +83,6 @@ routearray:
 
 not_match_function:
 if iroute not match the request,the not_match_function will be called.It has two parameters,req and res.
+support: get,post,put,delete,options,head,other (other include copy,trace,lock.. etc)
 
 more example see /example/example.js

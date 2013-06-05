@@ -13,7 +13,11 @@ iroute.add([
 ["put:/test9/test9/test9/test9?key1",function(req,res){res.end('test9')}],
 ["delete:/test10",function(req,res){res.end('test10')}],
 ["delete:/test11/test11/test11/test11",function(req,res){res.end('test11')}],
-["delete:/test12/test12/test12/test12?key1&key2&key3&key4&key5&key6&key7&key8&key9&key10",function(req,res){res.end('test12')}]
+["delete:/test12/test12/test12/test12?key1&key2&key3&key4&key5&key6&key7&key8&key9&key10",function(req,res){res.end('test12')}],
+
+["head:/test6/test6/test6/test6?key1&key2&key3",function(req,res){res.end('')}],
+["options:/test6/test6/test6/test6?key1&key2&key3",function(req,res){res.end('test14')}],
+["other:/test6/test6/test6/test6?key1&key2&key3",function(req,res){res.end('test15')}],
 
 ],function(req,res){
 	res.statusCode = 404;
@@ -28,7 +32,7 @@ var assert = require('assert');
 
 
 
-var test_num = 16
+var test_num = 21
 var test_back = function(msg){
 	console.log(msg, 'test ok')
 	if(!--test_num){
@@ -172,4 +176,41 @@ request('/test12/test12/test12/test12?key1=&key2=&key3=&key4=&key5=&key6=&key7=&
 	test_back('del3')
 })
 
+
+
+
+
+
  
+request('/test6/test6/test6/test6?key1=1&key2=2&key3=3','HEAD',  function (error, response, body) {
+	assert.equal(response.statusCode,200)
+	test_back('HEAD')
+})
+
+request('/test6/test6/test6/test6?key1=1&key2=2&key3=3','OPTIONS',  function (error, response, body) {
+	assert.equal(response.statusCode,200)
+	assert.equal(body,'test14')
+	test_back('OPTIONS')
+})
+
+
+
+
+request('/test6/test6/test6/test6?key1=1&key2=2&key3=3','TRACE',  function (error, response, body) {
+	assert.equal(response.statusCode,200)
+	assert.equal(body,'test15')
+	test_back('TRACE')
+})
+
+request('/test6/test6/test6/test6?key1=1&key2=2&key3=3','COPY',  function (error, response, body) {
+	assert.equal(response.statusCode,200)
+	assert.equal(body,'test15')
+	test_back('COPY')
+})
+
+request('/test6/test6/test6/?key1=1&key2=2&key3=3','LOCK',  function (error, response, body) {
+	assert.equal(response.statusCode,404)
+	assert.equal(body,'404')
+	test_back('LOCK')
+})
+

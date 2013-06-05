@@ -23,6 +23,14 @@ namespace iroute{
   static int put_len;
   static handler_route **handler_p_delete;        //delete
   static int delete_len;
+
+  static handler_route **handler_p_head;        //head
+  static int head_len;
+  static handler_route **handler_p_options;        //options
+  static int options_len;
+  static handler_route **handler_p_other;        //other
+  static int other_len;
+
   static Persistent<Object> default_callback;     //默认回调函数，表示未匹配到控制器
 
 }
@@ -70,15 +78,35 @@ Handle<Value> route::add(const Arguments& args){
 	Local<Object> delete_array = add_obj->Get(String::New("delete"))->ToObject();
 	iroute::delete_len = add_obj->Get(String::New("delete_len"))->Uint32Value();
 
+
+	Local<Object> head_array = add_obj->Get(String::New("head"))->ToObject();
+	iroute::head_len = add_obj->Get(String::New("head_len"))->Uint32Value();
+
+	Local<Object> options_array = add_obj->Get(String::New("options"))->ToObject();
+	iroute::options_len = add_obj->Get(String::New("options_len"))->Uint32Value();
+
+	Local<Object> other_array = add_obj->Get(String::New("other"))->ToObject();
+	iroute::other_len = add_obj->Get(String::New("other_len"))->Uint32Value();
+
+
 	iroute::handler_p_get = new handler_route*[iroute::get_len]; //创建动态指针数组
 	iroute::handler_p_post = new handler_route*[iroute::post_len];
 	iroute::handler_p_put = new handler_route*[iroute::put_len];
 	iroute::handler_p_delete = new handler_route*[iroute::delete_len];
 
+	iroute::handler_p_head = new handler_route*[iroute::head_len];
+	iroute::handler_p_options = new handler_route*[iroute::options_len];
+	iroute::handler_p_other = new handler_route*[iroute::other_len];
+
+
 	loop_add(get_array, iroute::handler_p_get, iroute::get_len);
 	loop_add(post_array, iroute::handler_p_post, iroute::post_len);
 	loop_add(put_array, iroute::handler_p_put, iroute::put_len);
 	loop_add(delete_array, iroute::handler_p_delete, iroute::delete_len);
+
+	loop_add(head_array, iroute::handler_p_head, iroute::head_len);
+	loop_add(options_array, iroute::handler_p_options, iroute::options_len);
+	loop_add(other_array, iroute::handler_p_other, iroute::other_len);
 
 	iroute::default_callback = Persistent<Object>::New(args[1]->ToObject());
 
@@ -184,6 +212,9 @@ void route::worker_callback(Request &req){
 	std::string method = req.method;
 
 
+	
+
+
 	if(method == "GET"){ //匹配url
 		handler_p = uri_match(iroute::handler_p_get, iroute::get_len, char_uri);
 	}
@@ -196,6 +227,17 @@ void route::worker_callback(Request &req){
 	else if(method == "DELETE"){
 		handler_p = uri_match(iroute::handler_p_delete, iroute::delete_len, char_uri);
 	}
+	else if(method == "HEAD"){
+		handler_p = uri_match(iroute::handler_p_head, iroute::head_len, char_uri);
+	}	
+	else if(method == "OPTIONS"){
+		handler_p = uri_match(iroute::handler_p_options, iroute::options_len, char_uri);
+	}
+	else if(iroute::other_len){//如果不是以上6种，则进入other匹配
+		handler_p = uri_match(iroute::handler_p_other, iroute::other_len, char_uri);
+	}
+
+
 	
 	if(handler_p && handler_p->char_param_count){
 

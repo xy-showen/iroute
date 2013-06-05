@@ -14,7 +14,11 @@ iroute.add([
 ["put:/test9/test9/test9/test9?key1",function(req,res){res.end('test9')}],
 ["delete:/test10",function(req,res){res.end('test10')}],
 ["delete:/test11/test11/test11/test11",function(req,res){res.end('test11')}],
-["delete:/test12/test12/test12/test12?key1&key2&key3&key4&key5&key6&key7&key8&key9&key10",function(req,res){res.end('test12')}]
+["delete:/test12/test12/test12/test12?key1&key2&key3&key4&key5&key6&key7&key8&key9&key10",function(req,res){res.end('test12')}],
+
+["head:/test6/test6/test6/test6?key1&key2&key3",function(req,res){res.end('')}],
+["options:/test6/test6/test6/test6?key1&key2&key3",function(req,res){res.end('test14')}],
+["other:/test6/test6/test6/test6?key1&key2&key3",function(req,res){res.end('test15')}]
 
 ],function(req,res){
 	res.statusCode = 404;
@@ -33,6 +37,9 @@ var assert = require('assert');
 http.createServer(function (req, res) {
 	//request.url
 	//request.method
+	if(req.method == "HEAD" ||req.method == "GET" ){
+		return iroute.route(req,res);
+	}
 	var buf_list = [];
 	var len=0;
 	req.on("data",function(chunk){
@@ -42,8 +49,9 @@ http.createServer(function (req, res) {
 	req.on("end", function(){
 		req.body = Buffer.concat(buf_list, len).toString();
 		if(req.url != '/favicon.ico') {
-		//console.log(req.url)
+
 		 iroute.route(req,res);
+
 		} 
 	})
 
@@ -56,7 +64,7 @@ console.log('Server running at http://127.0.0.1:8124/');
 
 
 
-var test_num = 16
+var test_num = 21
 var test_back = function(msg){
 	console.log(msg, 'test ok')
 	if(!--test_num){
@@ -80,16 +88,20 @@ function request(path, method, cb){
 	  //console.log('STATUS: ' + res.statusCode);
 	 //console.log('HEADERS: ' + JSON.stringify(res.headers));
 	  res.setEncoding('utf8');
+	  var s;
 	  res.on('data', function (chunk) {
-	  	cb(null, res, chunk+'');
+	  		s = chunk;
 	  });
-
+	  res.on('end',function(){
+	  	cb(null, res, s+'');
+	  })
 	});
 
 	req.on('error', function(e) {
 	  console.log('problem with request: ' + e.message);
 	});
-if(method !== "GET"){
+
+if(method === "POST" || method !== "PUT"){
 	// write data to request body
 	req.write('data\n');
 	req.write('data\n');
@@ -104,9 +116,10 @@ if(method !== "GET"){
 //begin test
 //get
 
+
 setTimeout(function(){
 	
-request('/TEST1/', 'GET', function (error, response, body) {
+request('/TEST1/', 'get', function (error, response, body) {
 	assert.equal(response.statusCode,200)
 	assert.equal(body,'test1')
 	test_back('get1')
@@ -222,3 +235,59 @@ request('/test12/test12/test12/test12?key1=&key2=&key3=&key4=&key5=&key6=&key7=&
 })
 
 },2500)
+
+
+
+
+
+//delete
+setTimeout(function(){
+ 
+setTimeout(function(){
+request('/test6/test6/test6/test6?key1=1&key2=2&key3=3','head',  function (error, response, body) {
+	assert.equal(response.statusCode,200)
+
+	test_back('HEAD')
+})
+},500)
+
+request('/test6/test6/test6/test6?key1=1&key2=2&key3=3','options',  function (error, response, body) {
+	assert.equal(response.statusCode,200)
+	assert.equal(body,'test14')
+	test_back('OPTIONS')
+})
+
+
+
+
+
+
+},3000)
+
+
+
+//delete
+setTimeout(function(){
+request('/test6/test6/test6/test6?key1=1&key2=2&key3=3','trace',  function (error, response, body) {
+	assert.equal(response.statusCode,200)
+	assert.equal(body,'test15')
+	test_back('TRACE')
+})
+
+request('/test6/test6/test6/test6?key1=1&key2=2&key3=3','copy',  function (error, response, body) {
+	assert.equal(response.statusCode,200)
+	assert.equal(body,'test15')
+	test_back('COPY')
+})
+
+request('/test6/test6/test6/?key1=1&key2=2&key3=3','lock',  function (error, response, body) {
+	assert.equal(response.statusCode,404)
+	assert.equal(body,'404')
+	test_back('LOCK')
+})
+
+
+
+},3500)
+
+
